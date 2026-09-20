@@ -131,7 +131,7 @@ class ShortsBlockAccessibilityService : AccessibilityService() {
     }
 
     private companion object {
-        const val SCAN_DELAY_MS = 350L
+        const val SCAN_DELAY_MS = 60_000L
         const val BLOCK_COOLDOWN_MS = 2_000L
     }
 }
