@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.BangShorts" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">#2563EB</item>
-        <item name="colorPrimaryVariant">#1D4ED8</item>
-        <item name="colorSecondary">#10B981</item>
-        <item name="android:statusBarColor">#0F172A</item>
-        <item name="android:navigationBarColor">#0F172A</item>
-    </style>
+    <string name="app_name">BangShorts</string>
+    <string name="hero_tagline">Focus, not doomscrolling</string>
+    <string name="protection_title">Protection</string>
+    <string name="protection_active">Protection active</string>
+    <string name="protection_disabled">Tap to enable protection</string>
+    <string name="open_accessibility_settings">Open accessibility settings</string>
+    <string name="blocked_apps_title">Blocked distractions</string>
+    <string name="start_focus_mode">Start focus mode</string>
+    <string name="app_description">BangShorts helps reduce distraction by blocking short-form content from selected apps and web pages. You can enable the Android accessibility service and use it as a focus helper for better digital habits.</string>
 </resources>
