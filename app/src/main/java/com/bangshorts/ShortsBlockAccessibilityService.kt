@@ -9,16 +9,16 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 
 /**
- * Leaves normal YouTube navigation and long-form videos alone. A block is
- * triggered only when the active screen looks like a Shorts/Reels player:
- * the screen must contain a short-form label plus at least two player-control
- * signals. This avoids treating the YouTube home tab's "Shorts" label as a
- * Shorts video.
+ * Leaves normal YouTube navigation and long-form videos alone. The first
+ * recognized Shorts/Reels video is allowed. Later, distinct short-form videos
+ * are blocked while Focus mode or an active schedule is enabled.
  */
 class ShortsBlockAccessibilityService : AccessibilityService() {
 
     private val handler = Handler(Looper.getMainLooper())
     private var lastBlockAt = 0L
+    private var allowedFirstVideo = false
+    private var allowedVideoFingerprint: String? = null
 
     private val packageToPreference = mapOf(
         "com.google.android.youtube" to "youtube",
@@ -31,6 +31,8 @@ class ShortsBlockAccessibilityService : AccessibilityService() {
 
     override fun onServiceConnected() {
         super.onServiceConnected()
+        allowedFirstVideo = false
+        allowedVideoFingerprint = null
         serviceInfo = AccessibilityServiceInfo().apply {
             eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED or
                 AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED or
@@ -49,18 +51,33 @@ class ShortsBlockAccessibilityService : AccessibilityService() {
         if (preferenceKey !in FocusPrefs.getProtectedApps(this)) return
         if (!FocusPrefs.isFocusModeEnabled(this) && !FocusPrefs.isScheduleActive(this)) return
 
-        // Shorts UI often appears a moment after the window-change event.
         handler.removeCallbacksAndMessages(null)
-        handler.postDelayed({ inspectCurrentScreen(packageName, preferenceKey) }, SCAN_DELAY_MS)
+        handler.postDelayed({ inspectCurrentScreen(packageName) }, SCAN_DELAY_MS)
     }
 
-    private fun inspectCurrentScreen(packageName: String, preferenceKey: String) {
+    private fun inspectCurrentScreen(packageName: String) {
         val now = SystemClock.elapsedRealtime()
         if (now - lastBlockAt < BLOCK_COOLDOWN_MS) return
 
         val root = rootInActiveWindow ?: return
         val screenText = collectNodeText(root)
         if (!isShortFormPlayer(screenText, packageName)) return
+
+        val fingerprint = screenText.lowercase()
+            .replace(Regex("\\s+"), " ")
+            .trim()
+            .take(FINGERPRINT_LENGTH)
+
+        // Allow the first Shorts/Reels video once per accessibility-service
+        // session. Repeated accessibility events for that same video remain
+        // allowed instead of immediately blocking it.
+        if (!allowedFirstVideo) {
+            allowedFirstVideo = true
+            allowedVideoFingerprint = fingerprint
+            return
+        }
+
+        if (fingerprint == allowedVideoFingerprint) return
 
         lastBlockAt = now
         FocusPrefs.incrementBlockCount(this)
@@ -92,20 +109,14 @@ class ShortsBlockAccessibilityService : AccessibilityService() {
                 shortFormLabel && controlCount >= 2 && !nonShortsNavigationOnly
             }
 
-            "com.instagram.android" -> {
+            "com.instagram.android" -> normalized.contains("reels") && controlCount >= 2
+            "com.facebook.katana", "com.facebook.lite" ->
                 normalized.contains("reels") && controlCount >= 2
-            }
 
-            "com.facebook.katana", "com.facebook.lite" -> {
-                normalized.contains("reels") && controlCount >= 2
-            }
-
-            "com.android.chrome" -> {
-                listOf(
-                    "youtube.com/shorts/", "youtube.com/shorts",
-                    "instagram.com/reels/", "facebook.com/reel/"
-                ).any(normalized::contains)
-            }
+            "com.android.chrome" -> listOf(
+                "youtube.com/shorts/", "youtube.com/shorts",
+                "instagram.com/reels/", "facebook.com/reel/"
+            ).any(normalized::contains)
 
             else -> false
         }
@@ -131,7 +142,8 @@ class ShortsBlockAccessibilityService : AccessibilityService() {
     }
 
     private companion object {
-        const val SCAN_DELAY_MS = 60_000L
+        const val SCAN_DELAY_MS = 350L
         const val BLOCK_COOLDOWN_MS = 2_000L
+        const val FINGERPRINT_LENGTH = 500
     }
 }
