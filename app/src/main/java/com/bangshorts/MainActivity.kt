@@ -31,7 +31,11 @@ class MainActivity : AppCompatActivity() {
         binding.focusModeButton.setOnClickListener {
             val enabled = !FocusPrefs.isFocusModeEnabled(this)
             FocusPrefs.setFocusModeEnabled(this, enabled)
-            binding.focusModeButton.text = if (enabled) getString(R.string.focus_mode_running) else getString(R.string.start_focus_mode)
+            binding.focusModeButton.text = if (enabled) {
+                getString(R.string.focus_mode_running)
+            } else {
+                getString(R.string.start_focus_mode)
+            }
         }
 
         binding.viewStatsButton.setOnClickListener {

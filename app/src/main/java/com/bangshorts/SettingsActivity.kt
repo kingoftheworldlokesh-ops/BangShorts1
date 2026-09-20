@@ -1,7 +1,6 @@
 package com.bangshorts
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bangshorts.databinding.ActivitySettingsBinding
 
@@ -28,7 +27,6 @@ class SettingsActivity : AppCompatActivity() {
             if (binding.browserCheckBox.isChecked) apps += "browser"
 
             FocusPrefs.setProtectedApps(this, apps)
-            Toast.makeText(this, "Protected apps saved", Toast.LENGTH_SHORT).show()
             finish()
         }
     }
