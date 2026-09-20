@@ -2,17 +2,22 @@ package com.bangshorts
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 
 /**
- * Blocks short-form destinations without treating an entire app as blocked.
- * Accessibility text varies by app version, so the rules intentionally require
- * player/feed-specific phrases instead of matching broad words such as "video".
+ * Leaves normal YouTube navigation and long-form videos alone. A block is
+ * triggered only when the active screen looks like a Shorts/Reels player:
+ * the screen must contain a short-form label plus at least two player-control
+ * signals. This avoids treating the YouTube home tab's "Shorts" label as a
+ * Shorts video.
  */
 class ShortsBlockAccessibilityService : AccessibilityService() {
 
+    private val handler = Handler(Looper.getMainLooper())
     private var lastBlockAt = 0L
 
     private val packageToPreference = mapOf(
@@ -29,11 +34,12 @@ class ShortsBlockAccessibilityService : AccessibilityService() {
         serviceInfo = AccessibilityServiceInfo().apply {
             eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED or
                 AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED or
-                AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED
+                AccessibilityEvent.TYPE_VIEW_SCROLLED
             feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC
-            flags = AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
+            flags = AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS or
+                AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS
             packageNames = packageToPreference.keys.toTypedArray()
-            notificationTimeout = 250
+            notificationTimeout = 200
         }
     }
 
@@ -43,6 +49,12 @@ class ShortsBlockAccessibilityService : AccessibilityService() {
         if (preferenceKey !in FocusPrefs.getProtectedApps(this)) return
         if (!FocusPrefs.isFocusModeEnabled(this) && !FocusPrefs.isScheduleActive(this)) return
 
+        // Shorts UI often appears a moment after the window-change event.
+        handler.removeCallbacksAndMessages(null)
+        handler.postDelayed({ inspectCurrentScreen(packageName, preferenceKey) }, SCAN_DELAY_MS)
+    }
+
+    private fun inspectCurrentScreen(packageName: String, preferenceKey: String) {
         val now = SystemClock.elapsedRealtime()
         if (now - lastBlockAt < BLOCK_COOLDOWN_MS) return
 
@@ -55,50 +67,45 @@ class ShortsBlockAccessibilityService : AccessibilityService() {
         FocusPrefs.setStreakDays(this, (FocusPrefs.getStreakDays(this) + 1).coerceAtMost(365))
         FocusPrefs.setSessionMinutes(this, FocusPrefs.getSessionMinutes(this) + 1)
 
-        // Back from the short-form player returns to the app's previous screen.
-        // We never close the host app directly.
+        // Back leaves the Shorts/Reels player; it does not close the host app.
         performGlobalAction(GLOBAL_ACTION_BACK)
     }
 
-    override fun onInterrupt() = Unit
+    override fun onInterrupt() {
+        handler.removeCallbacksAndMessages(null)
+    }
 
     private fun isShortFormPlayer(text: String, packageName: String): Boolean {
         val normalized = text.lowercase().replace(Regex("\\s+"), " ").trim()
+        val controls = listOf(
+            "like", "dislike", "comments", "comment", "share", "subscribe",
+            "remix", "more options", "save", "follow"
+        )
+        val controlCount = controls.count { normalized.contains(it) }
 
         return when (packageName) {
             "com.google.android.youtube", "com.google.android.apps.youtube.music" -> {
-                // Do not match the standalone navigation label "Shorts". The
-                // player/feed indicators below are much less likely to appear
-                // on the normal YouTube home screen.
-                listOf(
-                    "/shorts/",
-                    "youtube shorts player",
-                    "shorts player",
-                    "shorts feed",
-                    "shorts video"
-                ).any(normalized::contains)
+                val shortFormLabel = listOf("shorts", "short video", "shorts player")
+                    .any(normalized::contains)
+                val nonShortsNavigationOnly = normalized.contains("home") &&
+                    normalized.contains("subscriptions") && controlCount < 2
+                shortFormLabel && controlCount >= 2 && !nonShortsNavigationOnly
             }
 
-            "com.instagram.android" -> listOf(
-                "reels player",
-                "reels feed",
-                "reel video",
-                "instagram reels"
-            ).any(normalized::contains)
+            "com.instagram.android" -> {
+                normalized.contains("reels") && controlCount >= 2
+            }
 
-            "com.facebook.katana", "com.facebook.lite" -> listOf(
-                "reels player",
-                "reels feed",
-                "facebook reels",
-                "watch reels"
-            ).any(normalized::contains)
+            "com.facebook.katana", "com.facebook.lite" -> {
+                normalized.contains("reels") && controlCount >= 2
+            }
 
-            "com.android.chrome" -> listOf(
-                "youtube.com/shorts/",
-                "youtube.com/shorts",
-                "instagram.com/reels/",
-                "facebook.com/reel/"
-            ).any(normalized::contains)
+            "com.android.chrome" -> {
+                listOf(
+                    "youtube.com/shorts/", "youtube.com/shorts",
+                    "instagram.com/reels/", "facebook.com/reel/"
+                ).any(normalized::contains)
+            }
 
             else -> false
         }
@@ -124,6 +131,7 @@ class ShortsBlockAccessibilityService : AccessibilityService() {
     }
 
     private companion object {
+        const val SCAN_DELAY_MS = 350L
         const val BLOCK_COOLDOWN_MS = 2_000L
     }
 }
