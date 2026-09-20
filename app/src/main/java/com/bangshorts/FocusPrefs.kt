@@ -2,6 +2,7 @@ package com.bangshorts
 
 import android.content.Context
 import android.content.SharedPreferences
+import java.time.LocalTime
 
 object FocusPrefs {
     private const val PREFS_NAME = "bangshorts_prefs"
@@ -18,8 +19,8 @@ object FocusPrefs {
 
     fun getProtectedApps(context: Context): Set<String> {
         val raw = prefs(context).getString(KEY_PROTECTED_APPS, null)
-            ?: listOf("youtube", "instagram", "facebook", "browser").joinToString(",")
-        return raw.split(',').filter { it.isNotBlank() }.toSet()
+            ?: "youtube,instagram,facebook,browser"
+        return raw.split(',').filter(String::isNotBlank).toSet()
     }
 
     fun setProtectedApps(context: Context, apps: Set<String>) {
@@ -36,36 +37,41 @@ object FocusPrefs {
     fun isNightModeEnabled(context: Context): Boolean =
         prefs(context).getBoolean(KEY_NIGHT_MODE, false)
 
-    fun isMorningModeEnabled(context: Context): Boolean =
-        prefs(context).getBoolean(KEY_MORNING_MODE, false)
-
     fun setNightModeEnabled(context: Context, enabled: Boolean) {
         prefs(context).edit().putBoolean(KEY_NIGHT_MODE, enabled).apply()
     }
+
+    fun isMorningModeEnabled(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_MORNING_MODE, false)
 
     fun setMorningModeEnabled(context: Context, enabled: Boolean) {
         prefs(context).edit().putBoolean(KEY_MORNING_MODE, enabled).apply()
     }
 
-    fun getBlockCount(context: Context): Int =
-        prefs(context).getInt(KEY_BLOCK_COUNT, 0)
+    fun isScheduleActive(context: Context, now: LocalTime = LocalTime.now()): Boolean {
+        val nightActive = isNightModeEnabled(context) &&
+            (now >= LocalTime.of(22, 0) || now < LocalTime.of(7, 0))
+        val morningActive = isMorningModeEnabled(context) &&
+            now >= LocalTime.of(6, 0) && now < LocalTime.of(9, 0)
+        return nightActive || morningActive
+    }
+
+    fun getBlockCount(context: Context): Int = prefs(context).getInt(KEY_BLOCK_COUNT, 0)
 
     fun incrementBlockCount(context: Context) {
-        val current = getBlockCount(context)
-        prefs(context).edit().putInt(KEY_BLOCK_COUNT, current + 1).apply()
+        val next = getBlockCount(context) + 1
+        prefs(context).edit().putInt(KEY_BLOCK_COUNT, next).apply()
     }
 
-    fun getStreakDays(context: Context): Int =
-        prefs(context).getInt(KEY_STREAK_DAYS, 7)
+    fun getStreakDays(context: Context): Int = prefs(context).getInt(KEY_STREAK_DAYS, 0)
 
     fun setStreakDays(context: Context, days: Int) {
-        prefs(context).edit().putInt(KEY_STREAK_DAYS, days).apply()
+        prefs(context).edit().putInt(KEY_STREAK_DAYS, days.coerceAtLeast(0)).apply()
     }
 
-    fun getSessionMinutes(context: Context): Int =
-        prefs(context).getInt(KEY_SESSION_MINUTES, 134)
+    fun getSessionMinutes(context: Context): Int = prefs(context).getInt(KEY_SESSION_MINUTES, 0)
 
     fun setSessionMinutes(context: Context, minutes: Int) {
-        prefs(context).edit().putInt(KEY_SESSION_MINUTES, minutes).apply()
+        prefs(context).edit().putInt(KEY_SESSION_MINUTES, minutes.coerceAtLeast(0)).apply()
     }
 }

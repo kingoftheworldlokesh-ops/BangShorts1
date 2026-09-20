@@ -14,14 +14,17 @@
     <string name="streak">Streak</string>
     <string name="protected_apps">Protected apps</string>
     <string name="focus_schedule">Focus schedule</string>
-    <string name="app_description">BangShorts helps reduce distraction by blocking short-form content from selected apps and web pages. You can enable the Android accessibility service and use it as a focus helper for better digital habits.</string>
+    <string name="app_description">BangShorts blocks selected short-form destinations while focus mode or an active schedule is running. Blocking and statistics are stored locally on this device.</string>
     <string name="screen_title_stats">Your focus stats</string>
     <string name="screen_title_settings">Protected apps</string>
     <string name="screen_title_schedule">Focus schedule</string>
-    <string name="session_time">Session time</string>
-    <string name="reduction_rate">Reduction</string>
+    <string name="session_time">Protected activity</string>
+    <string name="reduction_rate">Reduction estimate</string>
     <string name="back">Back</string>
     <string name="save">Save</string>
-    <string name="night_mode">Night mode</string>
+    <string name="night_mode">Night protection</string>
+    <string name="night_mode_description">Block selected content from 10:00 PM to 7:00 AM.</string>
     <string name="morning_mode">Morning focus</string>
+    <string name="morning_mode_description">Block selected content from 6:00 AM to 9:00 AM.</string>
+    <string name="schedule_summary">Schedules are enforced by the accessibility service when protection is enabled.</string>
 </resources>

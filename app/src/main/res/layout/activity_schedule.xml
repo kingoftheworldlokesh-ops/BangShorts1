@@ -5,13 +5,11 @@
     android:layout_height="match_parent"
     android:background="#0F172A"
     android:fillViewport="true">
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="24dp">
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -19,7 +17,13 @@
             android:textColor="#F8FAFC"
             android:textSize="28sp"
             android:textStyle="bold" />
-
+        <TextView
+            android:id="@+id/scheduleSummary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="#CBD5E1"
+            android:textSize="15sp" />
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -27,29 +31,40 @@
             app:cardBackgroundColor="#111827"
             app:cardCornerRadius="18dp"
             app:cardElevation="0dp">
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="18dp">
-
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/nightModeSwitch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/night_mode"
                     android:textColor="#F8FAFC" />
-
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="16dp"
+                    android:text="@string/night_mode_description"
+                    android:textColor="#94A3B8"
+                    android:textSize="13sp" />
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/morningModeSwitch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
                     android:text="@string/morning_mode"
                     android:textColor="#F8FAFC" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="16dp"
+                    android:text="@string/morning_mode_description"
+                    android:textColor="#94A3B8"
+                    android:textSize="13sp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-
         <Button
             android:id="@+id/saveScheduleButton"
             android:layout_width="match_parent"
