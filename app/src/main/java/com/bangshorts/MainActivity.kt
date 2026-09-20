@@ -29,7 +29,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.focusModeButton.setOnClickListener {
-            binding.focusModeButton.text = "Focus mode ready"
+            binding.focusModeButton.text = getString(R.string.focus_mode_running)
+        }
+
+        binding.viewStatsButton.setOnClickListener {
+            startActivity(Intent(this, StatsActivity::class.java))
         }
 
         refreshStatus()

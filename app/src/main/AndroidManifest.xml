@@ -18,6 +18,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".StatsActivity"
+            android:exported="false" />
+
         <service
             android:name=".ShortsBlockAccessibilityService"
             android:enabled="true"
