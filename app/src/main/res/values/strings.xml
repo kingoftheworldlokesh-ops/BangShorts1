@@ -14,7 +14,12 @@
     <string name="streak">Streak</string>
     <string name="app_description">BangShorts helps reduce distraction by blocking short-form content from selected apps and web pages. You can enable the Android accessibility service and use it as a focus helper for better digital habits.</string>
     <string name="screen_title_stats">Your focus stats</string>
+    <string name="screen_title_settings">Protected apps</string>
+    <string name="screen_title_schedule">Focus schedule</string>
     <string name="session_time">Session time</string>
     <string name="reduction_rate">Reduction</string>
     <string name="back">Back</string>
+    <string name="save">Save</string>
+    <string name="night_mode">Night mode</string>
+    <string name="morning_mode">Morning focus</string>
 </resources>

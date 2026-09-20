@@ -165,6 +165,22 @@
             android:layout_marginTop="12dp"
             android:text="@string/view_stats" />
 
+        <Button
+            android:id="@+id/settingsButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/protected_apps" />
+
+        <Button
+            android:id="@+id/scheduleButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/focus_schedule" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

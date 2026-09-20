@@ -29,11 +29,27 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.focusModeButton.setOnClickListener {
-            binding.focusModeButton.text = getString(R.string.focus_mode_running)
+            val enabled = !FocusPrefs.isFocusModeEnabled(this)
+            FocusPrefs.setFocusModeEnabled(this, enabled)
+            binding.focusModeButton.text = if (enabled) getString(R.string.focus_mode_running) else getString(R.string.start_focus_mode)
         }
 
         binding.viewStatsButton.setOnClickListener {
             startActivity(Intent(this, StatsActivity::class.java))
+        }
+
+        binding.settingsButton.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
+
+        binding.scheduleButton.setOnClickListener {
+            startActivity(Intent(this, ScheduleActivity::class.java))
+        }
+
+        binding.focusModeButton.text = if (FocusPrefs.isFocusModeEnabled(this)) {
+            getString(R.string.focus_mode_running)
+        } else {
+            getString(R.string.start_focus_mode)
         }
 
         refreshStatus()

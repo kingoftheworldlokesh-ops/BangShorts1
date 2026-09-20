@@ -22,6 +22,14 @@
             android:name=".StatsActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ScheduleActivity"
+            android:exported="false" />
+
         <service
             android:name=".ShortsBlockAccessibilityService"
             android:enabled="true"
