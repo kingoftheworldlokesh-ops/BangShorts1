@@ -39,6 +39,9 @@ class ShortsBlockAccessibilityService : AccessibilityService() {
         val blockedTerms = listOf("shorts", "reels", "watch", "video")
 
         if (blockedTerms.any { term -> text.contains(term, ignoreCase = true) }) {
+            FocusPrefs.incrementBlockCount(this)
+            val streak = (FocusPrefs.getStreakDays(this) + 1).coerceAtMost(30)
+            FocusPrefs.setStreakDays(this, streak)
             performGlobalAction(GLOBAL_ACTION_BACK)
         }
     }

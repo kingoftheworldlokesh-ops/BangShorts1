@@ -49,10 +49,11 @@
                         android:textSize="12sp" />
 
                     <TextView
+                        android:id="@+id/blockedStatsText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="23"
+                        android:text="0"
                         android:textColor="#F8FAFC"
                         android:textSize="26sp"
                         android:textStyle="bold" />
@@ -82,10 +83,11 @@
                         android:textSize="12sp" />
 
                     <TextView
+                        android:id="@+id/reductionText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="31%"
+                        android:text="0%"
                         android:textColor="#F8FAFC"
                         android:textSize="26sp"
                         android:textStyle="bold" />
@@ -115,6 +117,7 @@
                     android:textSize="12sp" />
 
                 <TextView
+                    android:id="@+id/sessionTimeText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"

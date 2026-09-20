@@ -59,10 +59,11 @@
                         android:textSize="12sp" />
 
                     <TextView
+                        android:id="@+id/blockedCountText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="23"
+                        android:text="0"
                         android:textColor="#F8FAFC"
                         android:textSize="28sp"
                         android:textStyle="bold" />
@@ -92,6 +93,7 @@
                         android:textSize="12sp" />
 
                     <TextView
+                        android:id="@+id/streakText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"

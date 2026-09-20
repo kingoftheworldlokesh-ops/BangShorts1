@@ -17,6 +17,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.blockedCountText.text = FocusPrefs.getBlockCount(this).toString()
+        binding.streakText.text = "${FocusPrefs.getStreakDays(this)} days"
+
         binding.openSettingsButton.setOnClickListener {
             openAccessibilitySettings()
         }
@@ -61,6 +64,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        binding.blockedCountText.text = FocusPrefs.getBlockCount(this).toString()
+        binding.streakText.text = "${FocusPrefs.getStreakDays(this)} days"
         refreshStatus()
     }
 
